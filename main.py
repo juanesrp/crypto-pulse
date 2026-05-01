@@ -1,14 +1,29 @@
+from contextlib import asynccontextmanager
+import asyncio
+
 from fastapi import FastAPI
-from routers.prices import router as prices_router
+from routers import router as api_routers
+from workers.notification_worker import process_notifications
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+
+    task = asyncio.create_task(process_notifications())
+
+    yield
+
+    task.cancel()
 
 
 app = FastAPI(
     title="CryptoPulse API",
     description="API de precios de criptomonedas",
     version="0.1.0",
+    lifespan=lifespan,
 )
 
-app.include_router(prices_router)
+app.include_router(api_routers)
 
 
 @app.get("/health")
