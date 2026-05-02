@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 import asyncio
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from routers import router as api_routers
 from workers.notification_worker import process_notifications
 
@@ -22,6 +23,14 @@ app = FastAPI(
     description="API de precios de criptomonedas",
     version="0.1.0",
     lifespan=lifespan,
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 app.include_router(api_routers)
