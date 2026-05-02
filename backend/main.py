@@ -5,14 +5,15 @@ from fastapi import FastAPI
 from routers import router as api_routers
 from workers.notification_worker import process_notifications
 
+from core.database import create_tables
+import models
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-
+    await create_tables()
     task = asyncio.create_task(process_notifications())
-
     yield
-
     task.cancel()
 
 
