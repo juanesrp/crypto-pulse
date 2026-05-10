@@ -20,6 +20,12 @@ export const authApi = {
 
 export const tokenStorage = {
   get: () => localStorage.getItem("access_token"),
-  set: (token: string) => localStorage.setItem("access_token", token),
-  remove: () => localStorage.removeItem("access_token"),
+  set: (token: string) => {
+    localStorage.setItem("access_token", token)
+    document.cookie = `access_token=${token}; path=/; SameSite=Strict`
+  },
+  remove: () => {
+    localStorage.removeItem("access_token")
+    document.cookie = "access_token=; path=/; max-age=0"
+  },
 }
