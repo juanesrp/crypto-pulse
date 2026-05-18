@@ -18,6 +18,16 @@ services:
       timeout: 5s
       retries: 5
 
+  price-service:
+    build: ./services/price-service
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./.envs/.price-service
+    depends_on:
+      redis:
+        condition: service_started
+
   api:
     build: ./backend
     ports:
@@ -27,6 +37,14 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_started
+
+  notification-worker:
+    build: ./services/notification-worker
+    env_file:
+      - ./.envs/.notification-worker
+    depends_on:
       redis:
         condition: service_started
 
