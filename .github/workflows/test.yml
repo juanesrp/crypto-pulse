@@ -2,7 +2,7 @@ name: Tests
 
 on:
   push:
-    branches: [main, microservice]
+    branches: [main, microservices]
   pull_request:
     branches: [main]
 
