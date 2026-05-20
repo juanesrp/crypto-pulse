@@ -1,5 +1,7 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from core.database import get_db
 from services.price_service import get_prices
 from services.alert_service import get_alerts
 from services.notification_service import push_notification, get_queue_length
@@ -13,11 +15,11 @@ async def get_prices_endpoint():
 
 
 @router.get("/check-alerts")
-async def check_alerts(user_id: str):
+async def check_alerts(user_id: str, db: AsyncSession = Depends(get_db)):
 
     current_prices = await get_prices()
 
-    alerts = await get_alerts(user_id)
+    alerts = await get_alerts(user_id, db)
 
     triggered = []
 

@@ -1,5 +1,6 @@
 import json
-from core.redis import redis_client
+
+import core.redis as redis_core
 
 QUEUE_KEY = "notifications:queue"
 
@@ -17,10 +18,10 @@ async def push_notification(
         }
     )
 
-    await redis_client.lpush(QUEUE_KEY, message)
+    await redis_core.redis_client.lpush(QUEUE_KEY, message)
     print(f"-> Notificacion encolada para usuario {user_id}: {coin} a {current_price}")
 
 
 async def get_queue_length() -> int:
 
-    return await redis_client.llen(QUEUE_KEY)
+    return await redis_core.redis_client.llen(QUEUE_KEY)

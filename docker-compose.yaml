@@ -1,0 +1,52 @@
+services:
+  redis:
+    image: redis:alpine
+    ports:
+      - "6379:6379"
+
+  postgres:
+    image: postgres:16-alpine
+    env_file:
+      - ./.envs/.db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crypto -d cryptopulse"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  price-service:
+    build: ./services/price-service
+    ports:
+      - "8001:8001"
+    env_file:
+      - ./.envs/.price-service
+    depends_on:
+      redis:
+        condition: service_started
+
+  api:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./.envs/.api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  notification-worker:
+    build: ./services/notification-worker
+    env_file:
+      - ./.envs/.notification-worker
+    depends_on:
+      redis:
+        condition: service_started
+
+volumes:
+  postgres_data:
